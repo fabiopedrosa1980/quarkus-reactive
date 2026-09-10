@@ -51,23 +51,23 @@ Recurso base: `/products`
 
 | Método | Caminho          | Descrição                          | Corpo da requisição                | Resposta                     |
 |--------|------------------|-------------------------------------|-------------------------------------|-------------------------------|
-| GET    | `/products`      | Lista todos os produtos             | —                                    | `200 OK` + lista de produtos  |
-| GET    | `/products/{id}` | Busca um produto pelo id            | —                                    | `200 OK` ou `404 Not Found`   |
-| POST   | `/products`      | Cria um novo produto                | `{ "name": "...", "price": 0.0 }`   | `201 Created`                 |
-| PUT    | `/products/{id}` | Atualiza um produto existente       | `{ "name": "...", "price": 0.0 }`   | `200 OK` ou `404 Not Found`   |
-| DELETE | `/products/{id}` | Remove um produto                   | —                                    | `204 No Content` ou `404 Not Found` |
+| GET    | `api/v1//products`      | Lista todos os produtos             | —                                    | `200 OK` + lista de produtos  |
+| GET    | `api/v1//products/{id}` | Busca um produto pelo id            | —                                    | `200 OK` ou `404 Not Found`   |
+| POST   | `api/v1//products`      | Cria um novo produto                | `{ "name": "...", "price": 0.0 }`   | `201 Created`                 |
+| PUT    | `api/v1//products/{id}` | Atualiza um produto existente       | `{ "name": "...", "price": 0.0 }`   | `200 OK` ou `404 Not Found`   |
+| DELETE | `api/v1//products/{id}` | Remove um produto                   | —                                    | `204 No Content` ou `404 Not Found` |
 
 Exemplos com `curl`:
 
 ```shell script
 # Listar produtos
-curl http://localhost:8080/products
+curl http://localhost:8080/api/v1/products
 
 # Buscar produto por id
-curl http://localhost:8080/products/1
+curl http://localhost:8080/api/v1/products/1
 
 # Criar produto
-curl -X POST http://localhost:8080/products \
+curl -X POST http://localhost:8080/api/v1/products \
   -H "Content-Type: application/json" \
   -d '{"name": "Teclado mecânico", "price": 350.00}'
 
