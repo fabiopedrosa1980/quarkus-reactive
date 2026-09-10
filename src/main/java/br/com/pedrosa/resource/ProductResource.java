@@ -7,6 +7,7 @@ import br.com.pedrosa.service.ProductService;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -17,7 +18,7 @@ import static org.jboss.resteasy.reactive.RestResponse.Status.CREATED;
 import static org.jboss.resteasy.reactive.RestResponse.Status.OK;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NO_CONTENT;
 
-@Path("/products")
+@Path("api/v1/products")
 @ApplicationScoped
 public class ProductResource {
 
@@ -38,7 +39,7 @@ public class ProductResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Uni<RestResponse<ProductResponse>> create(ProductRequest productRequest) {
+    public Uni<RestResponse<ProductResponse>> create(@Valid ProductRequest productRequest) {
         return productService.create(productRequest)
                 .map(productResponse -> RestResponse.status(CREATED, productResponse));
     }
@@ -46,7 +47,7 @@ public class ProductResource {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Uni<RestResponse<ProductResponse>> update(@PathParam("id") Long id, ProductRequest productRequest) {
+    public Uni<RestResponse<ProductResponse>> update(@PathParam("id") Long id, @Valid ProductRequest productRequest) {
         return productService.update(id, productRequest)
                 .map(productResponse -> RestResponse.status(OK, productResponse));
     }

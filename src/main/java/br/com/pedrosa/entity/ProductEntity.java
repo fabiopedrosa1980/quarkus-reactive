@@ -19,6 +19,5 @@ public class ProductEntity extends PanacheEntity {
     public void fromRequest(ProductRequest productRequest){
         this.name = productRequest.name();
         this.price = productRequest.price();
-
     }
 }
