@@ -56,6 +56,6 @@ public class ProductResource {
     @Path("/{id}")
     public Uni<RestResponse<Void>> delete(@PathParam("id") Long id) {
         return productService.delete(id)
-                .map(ignored -> RestResponse.status(NO_CONTENT));
+                .map(_ -> RestResponse.status(NO_CONTENT));
     }
 }
