@@ -88,26 +88,26 @@ Exemplos com `curl`:
 
 ```
 # Listar produtos (página 1, tamanho padrão)
-curl http://localhost:8080/products
+curl http://localhost:8080/api/v1/products
 
 # Listar produtos com paginação explícita
-curl "http://localhost:8080/products?page=2&size=10"
+curl "http://localhost:8080/api/v1/products?page=2&size=10"
 
 # Buscar produto por id
-curl http://localhost:8080/products/1
+curl http://localhost:8080/api/v1/products/1
 
 # Criar produto
-curl -X POST http://localhost:8080/products \
+curl -X POST http://localhost:8080/api/v1/products \
   -H "Content-Type: application/json" \
   -d '{"name": "Teclado mecânico", "price": 350.00}'
 
 # Atualizar produto
-curl -X PUT http://localhost:8080/products/1 \
+curl -X PUT http://localhost:8080/api/v1/products/1 \
   -H "Content-Type: application/json" \
   -d '{"name": "Teclado mecânico RGB", "price": 399.90}'
 
 # Remover produto
-curl -X DELETE http://localhost:8080/products/1
+curl -X DELETE http://localhost:8080/api/v1/products/1
 ```
 
 Requisições para um produto inexistente retornam `404 Not Found`, tratado pelo `NotFoundExceptionMapper`. Requisições com `page` menor que `1` retornam `400 Bad Request`.
@@ -163,9 +163,9 @@ Para saber mais sobre executáveis nativos, consulte <https://quarkus.io/guides/
 ```
 src/main/java/br/com/pedrosa/
 ├── entity/     # Entidades Panache (ProductEntity)
-├── request/    # DTOs de entrada (ProductRequest)
-├── response/   # DTOs de saída (ProductResponse, PagedResponse)
 ├── resource/   # Endpoints REST (ProductResource)
+│   ├── request/   # DTOs de entrada (ProductRequest)
+│   └── response/  # DTOs de saída (ProductResponse, PagedResponse)
 ├── service/    # Regras de negócio (ProductService)
 └── exception/  # Mapeadores de exceção (NotFoundExceptionMapper)
 ```
