@@ -49,7 +49,7 @@ Ajuste usuário, senha e URL de acordo com o seu ambiente de produção. Em `imp
 
 ## Endpoints
 
-Recurso base: `/products`
+Recurso base: `/api/v1/products`
 
 | Método | Caminho          | Descrição                     | Corpo da requisição               | Resposta                            |
 | ------ | ---------------- | ----------------------------- | --------------------------------- | ----------------------------------- |
