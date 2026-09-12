@@ -14,6 +14,7 @@ API REST reativa de CRUD de produtos, construída com [Quarkus](https://quarkus.
 ## Pré-requisitos
 
 - JDK 25+
+- Docker
 - PostgreSQL disponível (local, em container, ou via Dev Services do Quarkus em modo dev)
 - Não é necessário ter o Maven instalado — use o wrapper `./mvnw`
 
@@ -21,10 +22,9 @@ API REST reativa de CRUD de produtos, construída com [Quarkus](https://quarkus.
 
 Você pode rodar a aplicação em modo dev, com live coding:
 
-```shell script
+```
 ./mvnw quarkus:dev
 ```
-
 > **NOTA:** o Quarkus disponibiliza uma Dev UI, acessível apenas em modo dev, em <http://localhost:8080/q/dev/>.
 
 Em modo dev, se nenhum banco estiver configurado, o Quarkus sobe automaticamente um container PostgreSQL via **Dev Services**.
@@ -33,7 +33,7 @@ Em modo dev, se nenhum banco estiver configurado, o Quarkus sobe automaticamente
 
 As configurações do datasource ficam em `src/main/resources/application.properties`:
 
-```properties
+```
 quarkus.datasource.db-kind = postgresql
 
 %prod.quarkus.datasource.username = hibernate
@@ -45,84 +45,114 @@ quarkus.datasource.db-kind = postgresql
 
 Ajuste usuário, senha e URL de acordo com o seu ambiente de produção. Em `import.sql` há dados de exemplo (tabela `Product` com alguns produtos) usados para popular o banco.
 
+> **NOTA:** se o script `import.sql` inserir produtos com `id` fixo, ajuste a sequence do Postgres após os inserts (ex.: `SELECT setval('products_seq', (SELECT MAX(id) FROM Product));`) para evitar conflito de chave primária na primeira inserção feita pela aplicação.
+
 ## Endpoints
 
 Recurso base: `/products`
 
-| Método | Caminho                          | Descrição                          | Corpo da requisição                | Resposta                     |
-|--------|----------------------------------|-------------------------------------|-------------------------------------|-------------------------------|
-| GET    | `api/v1/products?page=1&size=10` | Lista todos os produtos             | —                                    | `200 OK` + lista de produtos  |
-| GET    | `api/v1/products/{id}`           | Busca um produto pelo id            | —                                    | `200 OK` ou `404 Not Found`   |
-| POST   | `api/v1/products`                | Cria um novo produto                | `{ "name": "...", "price": 0.0 }`   | `201 Created`                 |
-| PUT    | `api/v1/products/{id}`           | Atualiza um produto existente       | `{ "name": "...", "price": 0.0 }`   | `200 OK` ou `404 Not Found`   |
-| DELETE | `api/v1/products/{id}`           | Remove um produto                   | —                                    | `204 No Content` ou `404 Not Found` |
+| Método | Caminho          | Descrição                     | Corpo da requisição               | Resposta                            |
+| ------ | ---------------- | ----------------------------- | --------------------------------- | ----------------------------------- |
+| GET    | `/products`      | Lista produtos de forma paginada | —                               | `200 OK` + página de produtos       |
+| GET    | `/products/{id}` | Busca um produto pelo id      | —                                 | `200 OK` ou `404 Not Found`         |
+| POST   | `/products`      | Cria um novo produto          | `{ "name": "...", "price": 0.0 }` | `201 Created`                       |
+| PUT    | `/products/{id}` | Atualiza um produto existente | `{ "name": "...", "price": 0.0 }` | `200 OK` ou `404 Not Found`         |
+| DELETE | `/products/{id}` | Remove um produto             | —                                 | `204 No Content` ou `404 Not Found` |
+
+### Paginação em `GET /products`
+
+A listagem de produtos é paginada e ordenada por `name`. A página é `1`-based (a primeira página é `page=1`) e é validada para não aceitar valores menores que `1`.
+
+**Query params:**
+
+| Parâmetro | Tipo | Padrão | Descrição                                  |
+| --------- | ---- | ------ | ------------------------------------------- |
+| `page`    | int  | `1`    | Número da página, começando em `1`         |
+| `size`    | int  | `20`   | Quantidade de itens por página (máx. `100`) |
+
+**Resposta (`PagedResponse<ProductResponse>`):**
+
+```json
+{
+  "content": [
+    { "id": 1, "name": "Macbook Pro", "price": 23000.00 }
+  ],
+  "totalElements": 3,
+  "totalPages": 1,
+  "pageIndex": 1,
+  "pageSize": 20
+}
+```
 
 Exemplos com `curl`:
 
-```shell script
-# Listar produtos
-curl http://localhost:8080/api/v1/products?page=1&size=10
+```
+# Listar produtos (página 1, tamanho padrão)
+curl http://localhost:8080/products
+
+# Listar produtos com paginação explícita
+curl "http://localhost:8080/products?page=2&size=10"
 
 # Buscar produto por id
-curl http://localhost:8080/api/v1/products/1
+curl http://localhost:8080/products/1
 
 # Criar produto
-curl -X POST http://localhost:8080/api/v1/products \
+curl -X POST http://localhost:8080/products \
   -H "Content-Type: application/json" \
   -d '{"name": "Teclado mecânico", "price": 350.00}'
 
 # Atualizar produto
-curl -X PUT http://localhost:8080/api/v1/products/1 \
+curl -X PUT http://localhost:8080/products/1 \
   -H "Content-Type: application/json" \
   -d '{"name": "Teclado mecânico RGB", "price": 399.90}'
 
 # Remover produto
-curl -X DELETE http://localhost:8080/api/v1/products/1
+curl -X DELETE http://localhost:8080/products/1
 ```
 
-Requisições para um produto inexistente retornam `404 Not Found`, tratado pelo `NotFoundExceptionMapper`.
+Requisições para um produto inexistente retornam `404 Not Found`, tratado pelo `NotFoundExceptionMapper`. Requisições com `page` menor que `1` retornam `400 Bad Request`.
 
 ## Empacotando e executando a aplicação
 
 A aplicação pode ser empacotada com:
 
-```shell script
+```
 ./mvnw package
 ```
 
-Isso gera o arquivo `quarkus-run.jar` no diretório `target/quarkus-app/`. Note que não é um _über-jar_: as dependências são copiadas para `target/quarkus-app/lib/`.
+Isso gera o arquivo `quarkus-run.jar` no diretório `target/quarkus-app/`. Note que não é um *über-jar*: as dependências são copiadas para `target/quarkus-app/lib/`.
 
 A aplicação pode então ser executada com:
 
-```shell script
+```
 java -jar target/quarkus-app/quarkus-run.jar
 ```
 
-Se você quiser construir um _über-jar_, execute:
+Se você quiser construir um *über-jar*, execute:
 
-```shell script
+```
 ./mvnw package -Dquarkus.package.jar.type=uber-jar
 ```
 
-A aplicação, empacotada como _über-jar_, pode ser executada com `java -jar target/*-runner.jar`.
+A aplicação, empacotada como *über-jar*, pode ser executada com `java -jar target/*-runner.jar`.
 
 ## Criando um executável nativo
 
 Você pode criar um executável nativo com:
 
-```shell script
+```
 ./mvnw package -Dnative
 ```
 
 Ou, caso não tenha o GraalVM instalado, pode rodar o build nativo em um container:
 
-```shell script
+```
 ./mvnw package -Dnative -Dquarkus.native.container-build=true
 ```
 
 Depois, execute o binário nativo com:
 
-```shell script
+```
 ./target/quarkus-reactive-1.0.0-SNAPSHOT-runner
 ```
 
@@ -134,7 +164,7 @@ Para saber mais sobre executáveis nativos, consulte <https://quarkus.io/guides/
 src/main/java/br/com/pedrosa/
 ├── entity/     # Entidades Panache (ProductEntity)
 ├── request/    # DTOs de entrada (ProductRequest)
-├── response/   # DTOs de saída (ProductResponse)
+├── response/   # DTOs de saída (ProductResponse, PagedResponse)
 ├── resource/   # Endpoints REST (ProductResource)
 ├── service/    # Regras de negócio (ProductService)
 └── exception/  # Mapeadores de exceção (NotFoundExceptionMapper)
