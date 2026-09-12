@@ -1,4 +1,4 @@
-package br.com.pedrosa.response;
+package br.com.pedrosa.resource.response;
 
 import br.com.pedrosa.entity.ProductEntity;
 

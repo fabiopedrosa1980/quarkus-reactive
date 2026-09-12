@@ -1,4 +1,4 @@
-package br.com.pedrosa.request;
+package br.com.pedrosa.resource.request;
 
 
 import br.com.pedrosa.entity.ProductEntity;
@@ -9,10 +9,10 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record ProductRequest(
-        @NotBlank(message="Name may not be blank")
+        @NotBlank(message="Nome não pode estar em branco")
         String name,
-        @NotNull(message = "Price must be not be null")
-        @Positive(message = "Price must be greater than zero")
+        @NotNull(message = "Preco não pode ser null")
+        @Positive(message = "Preco precisar ser maior que 0")
         BigDecimal price) {
 
     public ProductEntity toEntity() {

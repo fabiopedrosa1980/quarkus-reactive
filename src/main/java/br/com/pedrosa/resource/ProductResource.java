@@ -1,18 +1,18 @@
 package br.com.pedrosa.resource;
 
-
-import br.com.pedrosa.request.ProductRequest;
-import br.com.pedrosa.response.ProductResponse;
+import br.com.pedrosa.resource.request.ProductRequest;
+import br.com.pedrosa.resource.response.PagedResponse;
+import br.com.pedrosa.resource.response.ProductResponse;
 import br.com.pedrosa.service.ProductService;
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
-
-import java.util.List;
 
 import static org.jboss.resteasy.reactive.RestResponse.Status.CREATED;
 import static org.jboss.resteasy.reactive.RestResponse.Status.OK;
@@ -26,8 +26,12 @@ public class ProductResource {
     ProductService productService;
 
     @GET
-    public Uni<List<ProductResponse>> getProducts(){
-        return productService.getProducts();
+    @WithSession
+    public Uni<PagedResponse<ProductResponse>> listProducts(
+            @QueryParam("page") @DefaultValue("1") @Min(value = 1, message = "page deve ser maior que 0") int page,
+            @QueryParam("size") @DefaultValue("20") @Min(value = 1, message = "size deve ser maior que 0") int size) {
+        int pageIndex = page - 1;
+        return productService.getProducts(pageIndex, size);
     }
 
     @GET

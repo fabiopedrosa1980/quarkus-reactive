@@ -1,6 +1,6 @@
 package br.com.pedrosa.exception;
 
-import br.com.pedrosa.response.ErrorResponse;
+import br.com.pedrosa.resource.response.ErrorResponse;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
