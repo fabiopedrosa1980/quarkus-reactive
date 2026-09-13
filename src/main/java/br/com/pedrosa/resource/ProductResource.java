@@ -1,7 +1,7 @@
 package br.com.pedrosa.resource;
 
 import br.com.pedrosa.resource.request.ProductRequest;
-import br.com.pedrosa.resource.response.PagedResponse;
+import br.com.pedrosa.resource.response.PaginationResponse;
 import br.com.pedrosa.resource.response.ProductResponse;
 import br.com.pedrosa.service.ProductService;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
@@ -27,9 +27,9 @@ public class ProductResource {
 
     @GET
     @WithSession
-    public Uni<PagedResponse<ProductResponse>> listProducts(
-            @QueryParam("page") @DefaultValue("1") @Min(value = 1, message = "page deve ser maior que 0") int page,
-            @QueryParam("size") @DefaultValue("20") @Min(value = 1, message = "size deve ser maior que 0") int size) {
+    public Uni<PaginationResponse<ProductResponse>> listProducts(
+            @QueryParam("page") @DefaultValue("1") @Min(value = 1, message = "Page deve ser maior que 0") int page,
+            @QueryParam("size") @DefaultValue("20") @Min(value = 1, message = "Size deve ser maior que 0") int size) {
         int pageIndex = page - 1;
         return productService.getProducts(pageIndex, size);
     }
