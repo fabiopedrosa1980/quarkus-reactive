@@ -119,7 +119,7 @@ curl -X POST http://localhost:8080/sales \
   -d '{"idProduct": 1, "quantity": 2}'
 
 # Acompanhar as vendas processadas em tempo real (SSE)
-curl -N http://localhost:8080/sales-panel
+curl -N http://localhost:8080/api/v1/sales-panel
 ```
 
 ## Empacotando e executando a aplicação
