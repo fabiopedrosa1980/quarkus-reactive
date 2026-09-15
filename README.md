@@ -98,7 +98,7 @@ Requisições para um produto inexistente retornam `404 Not Found`, tratado pelo
 
 ### Vendas (assíncrono via Kafka)
 
-Recurso base: `/sales`
+Recurso base: `api/v1/sales`
 
 | Método | Caminho  | Descrição                                              | Corpo da requisição                    | Resposta                                    |
 | ------ | -------- | ------------------------------------------------------- | ---------------------------------------- | --------------------------------------------- |

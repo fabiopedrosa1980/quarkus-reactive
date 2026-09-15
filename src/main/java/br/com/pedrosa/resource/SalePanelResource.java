@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 
 @ApplicationScoped
-@Path("/sales-panel")
+@Path("/api/v1/sales-panel")
 public class SalePanelResource {
 
     @Inject
